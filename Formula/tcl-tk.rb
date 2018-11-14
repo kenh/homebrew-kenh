@@ -10,7 +10,7 @@ class TclTk < Formula
     "tk installs some X11 headers and macOS provides an (older) Tcl/Tk"
 
   depends_on :x11 => :optional
-  depends_on "pkg-config" => :build if :build.with? "x11"
+  depends_on "pkg-config" => :build if build.with? "x11"
 
   resource "tcllib" do
     url "https://downloads.sourceforge.net/project/tcllib/tcllib/1.18/tcllib-1.18.tar.gz"
