@@ -6,15 +6,11 @@ class TclTk < Formula
   version "8.6.8"
   sha256 "c43cb0c1518ce42b00e7c8f6eaddd5195c53a98f94adc717234a65cbcfd3f96a"
 
-  bottle do
-    rebuild 1
-    sha256 "120f17e162aa5e7351d59a97dc068055b421892ebb6226734349ee759ca42754" => :mojave
-    sha256 "869c7dd3f4e4cd25dca3cda9f0ff8350af08c3ba18ebcc60b661ca8df58ba8a5" => :high_sierra
-    sha256 "d7ff69ed715709d44eaff72bca96099ad2815091fcd97358ad5aaa5239bf06b8" => :sierra
-  end
-
   keg_only :provided_by_macos,
     "tk installs some X11 headers and macOS provides an (older) Tcl/Tk"
+
+  depends_on :x11 => :optional
+  depends_on "pkg-config" => :build if :build.with? "x11"
 
   resource "tcllib" do
     url "https://downloads.sourceforge.net/project/tcllib/tcllib/1.18/tcllib-1.18.tar.gz"
@@ -58,8 +54,14 @@ class TclTk < Formula
 
     resource("tk").stage do
       cd "unix" do
-        system "./configure", *args, "--enable-aqua=yes",
-                              "--without-x", "--with-tcl=#{lib}"
+	if build.with? "x11"
+	  args << "--with-x"
+	else
+	  args << "--enable-aqua"
+	  args << "--without-x"
+	end
+
+        system "./configure", *args, "--with-tcl=#{lib}"
         system "make"
         system "make", "install"
         system "make", "install-private-headers"
